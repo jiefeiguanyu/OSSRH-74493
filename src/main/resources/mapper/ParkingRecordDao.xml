@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.jcj.dao.ParkingRecordDao">
+
+    <!--高级结果查询-->
+    <select id="sel" resultMap="relselall">
+        select pr.id pid, car_num, brand, region_id, status, add_time,
+        re.id rid,`name`
+        from parking_record pr,region re where re.id=pr.region_id
+        <!--对region进行判断-->
+        <if test="region!=null and region!=0">
+            and region_id=#{region}
+        </if>
+        <!--防止出现乱序的情况出现-->
+        group BY pr.id
+    </select>
+    <!--高级映射-->
+    <resultMap id="relselall" type="cn.jcj.vo.ParkingRecordVo" autoMapping="true">
+        <id property="id" column="pid"/>
+        <association property="region" javaType="cn.jcj.pojo.Region" autoMapping="true">
+            <id column="rid" property="id"/>
+        </association>
+    </resultMap>
+
+    <insert id="add">
+        insert into parking_record (car_num, brand, region_id, add_time)
+values (#{car_num}, #{brand}, #{region_id}, #{add_time})
+    </insert>
+    <update id="upd">
+        update parking_record
+        set status=1
+        where id=#{id}
+    </update>
+    <select id="selType" resultType="cn.jcj.pojo.Region">
+        select * from region
+    </select>
+</mapper>
